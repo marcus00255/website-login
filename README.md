@@ -6,3 +6,5 @@ how to push
 git add .
 git commit -m "message"
 git push
+
+how to branch
