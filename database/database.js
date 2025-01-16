@@ -1,13 +1,14 @@
 // Installerer mysql2/promise for å muliggjøre asynkron funksjonalitet
 const mysql = require("mysql2/promise");
+require("dotenv").config()
 
 // Oppretter en funksjon som lager en databasekobling
 async function createConnection() {
     return mysql.createConnection({
-        host: "localhost", // Angir databasen sin vert (her: localhost)
-        user: "root", // Brukernavnet for å logge inn på databasen
-        password: "Elefant4", // Passordet for å logge inn på databasen
-        database: "login", // Navnet på databasen som skal brukes
+        host: process.env.host,
+        user: process.env.database_username,
+        password: process.env.database_password,
+        database: process.env.database
     });
 }
 
