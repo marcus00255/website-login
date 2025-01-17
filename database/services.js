@@ -18,5 +18,20 @@ async function addUser(email, password) {
     connection.end();
 }
 
+async function authenticateUser(email, password) {
+    const connection = await createConnection()
+    connection.connect()
+
+    const query = "SELECT * FROM user WHERE email = ?;"
+    const [rows] = await connection.execute(query, [email])
+    const user = await rows[0]
+
+    const match = await bcrypt.compare(password, user.password)
+
+    connection.end()
+
+    return match
+}
+
 // Eksporterer funksjonen slik at den kan brukes i andre filer, for eksempel app.js
-module.exports = { addUser };
+module.exports = { addUser, authenticateUser };
