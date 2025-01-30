@@ -9,13 +9,21 @@ async function addUser(email, password) {
     // Åpner en databasekobling
     connection.connect();
 
-    const hashedPassword = bcrypt.hashSync(password, saltRounds)
+    const find_user_query = "SELECT * FROM user WHERE email = ?;"
+    const [rows] = await connection.execute(find_user_query, [email])
+    const user = await rows[0]
 
-    const query = "INSERT INTO user (email, password) VALUES (?, ?)";
-    connection.execute(query, [email, hashedPassword]);
+    if (user) {
+        return false
+    }
+
+    const query = "INSERT INTO user (email, password) VALUES (?, ?)"
+    const hashed_password = bcrypt.hashSync(password, saltRounds)
+    connection.execute(query, [email, hashed_password]);
 
     // Lukker databasekoblingen
     connection.end();
+    return true
 }
 
 async function authenticateUser(email, password) {
@@ -25,11 +33,17 @@ async function authenticateUser(email, password) {
     const query = "SELECT * FROM user WHERE email = ?;"
     const [rows] = await connection.execute(query, [email])
     const user = await rows[0]
+    console.log(user)
 
     const match = await bcrypt.compare(password, user.password)
 
     connection.end()
 
+    if (match) {
+        return {success: true, email: user.email, name: user.name}
+    }
+
+    console.log("Wrong password")
     return match
 }
 
