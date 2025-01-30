@@ -33,14 +33,21 @@ async function authenticateUser(email, password) {
     const query = "SELECT * FROM user WHERE email = ?;"
     const [rows] = await connection.execute(query, [email])
     const user = await rows[0]
-    console.log(user)
+    
 
     const match = await bcrypt.compare(password, user.password)
 
     connection.end()
 
     if (match) {
-        return {success: true, email: user.email, name: user.name}
+
+        let user_data = user
+        delete user_data.password
+        delete user_data.id
+
+        console.log(user_data)
+        return user_data
+        //return {success: true, email: user.email, name: user.name}
     }
 
     console.log("Wrong password")

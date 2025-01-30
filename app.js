@@ -73,15 +73,16 @@ app.post("/login", async (req, res) => {
     const auth = await authenticateUser(email, password)
 
     if (auth) {
-        req.session.email = auth.email
-        req.session.name = auth.name
+        req.session.user = auth
+        //req.session.email = auth.email
+        //req.session.name = auth.name
         return res.redirect("/dashboard")
     }
     return res.redirect("/login")
 })
 
 function is_authenticated(req, res, next) {
-    if (req.session.email) {
+    if (req.session.user.email) {
         next()
     } else {
         req.session.error = "Access denied!"
@@ -90,7 +91,7 @@ function is_authenticated(req, res, next) {
 }
 
 app.get("/dashboard", is_authenticated, (req, res) => {
-    res.render("dashboard", { name: req.session.name })
+    res.render("dashboard", { user: req.session.user })
 })
 
 // Starter serveren og lytter på port 3000
