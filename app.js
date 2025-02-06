@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-const { addUser, authenticateUser } = require("./database/services"); // Henter funkjsonen som vi eksporterte i services
+const { addUser, authenticateUser, delete_user } = require("./database/services"); // Henter funkjsonen som vi eksporterte i services
 const bodyParser = require("body-parser"); // Hjelper oss å hente ut req.body
 const validator = require("validator")
 const session = require("express-session")
@@ -74,6 +74,7 @@ app.post("/login", async (req, res) => {
 
     if (auth) {
         req.session.user = auth
+
         //req.session.email = auth.email
         //req.session.name = auth.name
         return res.redirect("/dashboard")
@@ -82,7 +83,7 @@ app.post("/login", async (req, res) => {
 })
 
 function is_authenticated(req, res, next) {
-    if (req.session.user.email) {
+    if (req.session.user) {
         next()
     } else {
         req.session.error = "Access denied!"
@@ -92,6 +93,16 @@ function is_authenticated(req, res, next) {
 
 app.get("/dashboard", is_authenticated, (req, res) => {
     res.render("dashboard", { user: req.session.user })
+})
+
+app.post("/dashboard/delete", is_authenticated, (req, res) => {
+    delete_user(req.session.user.email)
+    res.redirect("/login")
+})
+
+app.post("/logout", is_authenticated, (req, res) => {
+    req.session.destroy()
+    res.redirect("/login")
 })
 
 // Starter serveren og lytter på port 3000

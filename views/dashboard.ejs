@@ -1,2 +1,10 @@
 <h1>Dashboard</h1>
-<h2>Hello <%= user.password %></h2>
+<h2>Hello <%= user.email %></h2>
+
+<form method="post" action="/dashboard/delete">
+    <button type="submit">Delete</button>
+</form>
+
+<form method="post" action="/logout">
+    <button type="submit">Logout</button>
+</form>
